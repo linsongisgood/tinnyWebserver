@@ -2,7 +2,8 @@
 
 int main(int argc, char *argv[])
 {
-    //需要修改的数据库信息,登录名,密码,库名
+    //需要修改的数据库信息,登录名,密码,库名 
+    //测试git命令
     string user = "root";
     string passwd = "root123";
     string databasename = "yourdb";
