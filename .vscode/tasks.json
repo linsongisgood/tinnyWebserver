@@ -1,0 +1,35 @@
+{
+	"version": "2.0.0",
+	"tasks": [ //为了生成编译后的文件./server
+		{
+			"type": "cppbuild",
+			"label": "build1",  //和launch.json文件中的prelaunchtask中的值相同
+			"command": "/usr/bin/g++",
+			"args": [
+				"-fdiagnostics-color=always",
+				"-g",
+				"main.cpp", 
+				"./timer/lst_timer.cpp",
+				"./http/http_conn.cpp" ,
+				"./log/log.cpp" ,
+				"./CGImysql/sql_connection_pool.cpp" , 
+				"webserver.cpp",
+				"config.cpp",
+				"-o",
+				"${workspaceFolder}/server",
+				"-lpthread", 
+				"-lmysqlclient", 
+				"-L/usr/lib64/mysql"
+			],    
+			//上面的代码相当于：   /usr/bin/g++ -fdiagnostics-color=always -g main.cpp ./timer/lst_timer.cpp ./http/http_conn.cpp ./log/log.cpp ./CGImysql/sql_connection_pool.cpp webserver.cpp config.cpp -o /home/ranxuqiao/TinyWebServer-master/TinyWebServer-master/se.exe -lpthread -lmysqlclient -L/usr/lib64/mysql
+			"options": {
+				"cwd": "${workspaceFolder}" ///home/ranxuqiao/TinyWebServer-master/TinyWebServer-master
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "编译器: /usr/bin/g++"
+		}
+	]
+}
