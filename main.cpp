@@ -6,6 +6,7 @@ int main(int argc, char *argv[])
     //测试git命令
     //第二次测试命令
     //第三次测试git命令
+    //第四次测试git命令
     string user = "root";
     string passwd = "root123";
     string databasename = "yourdb";
