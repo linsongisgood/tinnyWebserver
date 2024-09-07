@@ -78,9 +78,9 @@ void WebServer::log_write()
     {
         //初始化日志
         if (1 == m_log_write)
-            Log::get_instance()->init("./ServerLog", m_close_log, 2000, 800000, 800); //异步写入日志
+            Log::get_instance()->init("./log_record/ServerLog", m_close_log, 2000, 800000, 800); //异步写入日志
         else
-            Log::get_instance()->init("./ServerLog", m_close_log, 2000, 800000, 0);  //同步写入日志
+            Log::get_instance()->init("./log_record/ServerLog", m_close_log, 2000, 800000, 0);  //同步写入日志
     }
 }
 
