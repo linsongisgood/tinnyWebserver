@@ -158,9 +158,9 @@ void Utils::init(int timeslot)
 //对文件描述符设置非阻塞
 int Utils::setnonblocking(int fd)
 {
-    int old_option = fcntl(fd, F_GETFL);
-    int new_option = old_option | O_NONBLOCK;
-    fcntl(fd, F_SETFL, new_option);
+    int old_option = fcntl(fd, F_GETFL);        // 这一行调用了 fcntl 函数，并传入了文件描述符 fd 和 F_GETFL 常量。F_GETFL 用于获取文件描述符的当前标志。old_option 变量存储了当前的标志位
+    int new_option = old_option | O_NONBLOCK;   // 这一行创建了一个新的变量 new_option，它是 old_option 与 O_NONBLOCK 标志位的按位或运算结果
+    fcntl(fd, F_SETFL, new_option);             // 这一行再次调用了 fcntl 函数，这次使用了 F_SETFL 常量，它用于设置文件描述符的标志.new_option 被作为新的标志传递给 fcntl，使文件描述符变为非阻塞
     return old_option;
 }
 
