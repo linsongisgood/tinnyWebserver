@@ -680,11 +680,11 @@ bool http_conn::add_response(const char *format, ...)
 
     return true;
 }
-bool http_conn::add_status_line(int status, const char *title)
+bool http_conn::add_status_line(int status, const char *title)  //响应行
 {
     return add_response("%s %d %s\r\n", "HTTP/1.1", status, title);
 }
-bool http_conn::add_headers(int content_len)
+bool http_conn::add_headers(int content_len)   //响应头
 {
     return add_content_length(content_len) && add_linger() &&
            add_blank_line();
@@ -701,11 +701,11 @@ bool http_conn::add_linger()
 {
     return add_response("Connection:%s\r\n", (m_linger == true) ? "keep-alive" : "close");
 }
-bool http_conn::add_blank_line()
+bool http_conn::add_blank_line()     //空行
 {
     return add_response("%s", "\r\n");
 }
-bool http_conn::add_content(const char *content)
+bool http_conn::add_content(const char *content)     //响应体
 {
     return add_response("%s", content);
 }
