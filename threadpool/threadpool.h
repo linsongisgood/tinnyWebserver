@@ -43,7 +43,7 @@ threadpool<T>::threadpool( int actor_model, connection_pool *connPool, int threa
         throw std::exception();
     for (int i = 0; i < thread_number; ++i)
     {
-        if (pthread_create(m_threads + i, NULL, worker, this) != 0)
+        if (pthread_create(m_threads + i, NULL, worker, this) != 0) // this是指线程池对象的指针，是传给worker的参数
         {
             delete[] m_threads;
             throw std::exception();
@@ -61,7 +61,7 @@ threadpool<T>::~threadpool()
     delete[] m_threads;
 }
 template <typename T>
-bool threadpool<T>::append(T *request, int state)
+bool threadpool<T>::append(T *request, int state)  //reactor
 {
     m_queuelocker.lock();
     if (m_workqueue.size() >= m_max_requests)
@@ -76,7 +76,7 @@ bool threadpool<T>::append(T *request, int state)
     return true;
 }
 template <typename T>
-bool threadpool<T>::append_p(T *request)
+bool threadpool<T>::append_p(T *request)  //proactor
 {
     m_queuelocker.lock();
     if (m_workqueue.size() >= m_max_requests)
@@ -90,10 +90,10 @@ bool threadpool<T>::append_p(T *request)
     return true;
 }
 
-template <typename T>
-void *threadpool<T>::worker(void *arg)
+template <typename T> // 线程执行函数run()是在类内的，所以它的第一个默认参数是this指针，而pthread_create()第三个参数只接受唯一的一个void* 参数，但是加上this指针，一共两个参数，所以线程执行函数会出错。那么我们就要想办法解决这个问题了，既然在这个地方this指针不被欢迎，那我们就丢掉它，正巧，静态成员函数没有this指针，因为静态成员函数独立于任何实例对象，也就是所有实例对象在调用它的时候，它并不需要区分是谁在调用自己。又因为静态成员函数没有this指针，所以不能访问非静态成员变量和函数
+void *threadpool<T>::worker(void *arg) // arg参数是指线程池对象指针，是为了每个工作线程都能访问到线程池中的run函数
 {
-    threadpool *pool = (threadpool *)arg;
+    threadpool *pool = (threadpool *)arg;   
     pool->run();
     return pool;
 }

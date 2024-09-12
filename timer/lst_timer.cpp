@@ -17,18 +17,18 @@ sort_timer_lst::~sort_timer_lst()
     }
 }
 
-void sort_timer_lst::add_timer(util_timer *timer)
+void sort_timer_lst::add_timer(util_timer *timer)  //增加一个新的定时器在双向链表上
 {
-    if (!timer)
+    if (!timer)  //如果新增的节点为空，直接返回
     {
         return;
     }
-    if (!head)
+    if (!head)  //如果当前链表为空，则新增的这个定时器成为首个节点
     {
         head = tail = timer;
         return;
     }
-    if (timer->expire < head->expire)
+    if (timer->expire < head->expire) //有可能新增的节点的过期时间小于头结点的过期时间，这可能是由于头节点以及后面的节点一直在刷新时间
     {
         timer->next = head;
         head->prev = timer;
@@ -37,18 +37,18 @@ void sort_timer_lst::add_timer(util_timer *timer)
     }
     add_timer(timer, head);
 }
-void sort_timer_lst::adjust_timer(util_timer *timer)
+void sort_timer_lst::adjust_timer(util_timer *timer)  //因读写事件增加过期时间，某节点的定时器需要向后调整位置
 {
-    if (!timer)
+    if (!timer)  //如果定时器节点为空直接返回
     {
         return;
     }
     util_timer *tmp = timer->next;
-    if (!tmp || (timer->expire < tmp->expire))
+    if (!tmp || (timer->expire < tmp->expire))   //如果该定时器节点的下一个节点为空则表示这是尾节点，不用调整。 或者该节点增加的时间小于下一个节点，则不用调整。
     {
         return;
     }
-    if (timer == head)
+    if (timer == head)   //如果要调整的节点是头结点，则先删除这个节点，然后通过add_timer函数插入
     {
         head = head->next;
         head->prev = NULL;
@@ -57,43 +57,72 @@ void sort_timer_lst::adjust_timer(util_timer *timer)
     }
     else
     {
+        // 如果要调整的节点不是头结点，则先删除这个节点，然后通过add_timer函数插入
         timer->prev->next = timer->next;
         timer->next->prev = timer->prev;
         add_timer(timer, timer->next);
     }
 }
-void sort_timer_lst::del_timer(util_timer *timer)
+
+void sort_timer_lst::add_timer(util_timer *timer, util_timer *lst_head) // 增加一个新的定时器在双向链表上
+{
+    util_timer *prev = lst_head;
+    util_timer *tmp = prev->next;
+    while (tmp)  //循环直到找到前一个小于插入节点的过期时间
+    {
+        if (timer->expire < tmp->expire)  
+        {
+            prev->next = timer;
+            timer->next = tmp;
+            tmp->prev = timer;
+            timer->prev = prev;
+            break;
+        }
+        prev = tmp;
+        tmp = tmp->next;
+    }
+    if (!tmp)  //如果当前tmp==nullptr,则pre为尾节点，新增节点timer放在其后面
+    {
+        prev->next = timer;
+        timer->prev = prev;
+        timer->next = NULL;
+        tail = timer;
+    }
+}
+
+void sort_timer_lst::del_timer(util_timer *timer)   //删除某一个定时器节点
 {
     if (!timer)
     {
         return;
     }
-    if ((timer == head) && (timer == tail))
+    if ((timer == head) && (timer == tail))  //只有一个节点时
     {
         delete timer;
         head = NULL;
         tail = NULL;
         return;
     }
-    if (timer == head)
+    if (timer == head)   //不止一个节点，且要删除的节点在头部
     {
         head = head->next;
         head->prev = NULL;
         delete timer;
         return;
     }
-    if (timer == tail)
+    if (timer == tail) // 不止一个节点，且要删除的节点在尾部
     {
         tail = tail->prev;
         tail->next = NULL;
         delete timer;
         return;
-    }
+    }                 // 不止一个节点，且要删除的节点在中间
     timer->prev->next = timer->next;
     timer->next->prev = timer->prev;
     delete timer;
 }
-void sort_timer_lst::tick()  //寻找超时的定时器并删除
+
+void sort_timer_lst::tick()  //寻找所有超时的定时器并删除
 {
     if (!head)
     {
@@ -119,31 +148,7 @@ void sort_timer_lst::tick()  //寻找超时的定时器并删除
     }
 }
 
-void sort_timer_lst::add_timer(util_timer *timer, util_timer *lst_head)
-{
-    util_timer *prev = lst_head;
-    util_timer *tmp = prev->next;
-    while (tmp)
-    {
-        if (timer->expire < tmp->expire)
-        {
-            prev->next = timer;
-            timer->next = tmp;
-            tmp->prev = timer;
-            timer->prev = prev;
-            break;
-        }
-        prev = tmp;
-        tmp = tmp->next;
-    }
-    if (!tmp)
-    {
-        prev->next = timer;
-        timer->prev = prev;
-        timer->next = NULL;
-        tail = timer;
-    }
-}
+
 
 void Utils::init(int timeslot)
 {

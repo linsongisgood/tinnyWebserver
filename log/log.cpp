@@ -38,12 +38,14 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int split
     memset(m_buf, '\0', m_log_buf_size);
     m_split_lines = split_lines;
 
+
     time_t t = time(NULL);
     struct tm *sys_tm = localtime(&t);
     struct tm my_tm = *sys_tm;
 
- 
-    const char *p = strrchr(file_name, '/');
+
+
+    const char *p = strrchr(file_name, '/');   //filename = ./log_record/ServerLog
     char log_full_name[256] = {0};
 
     if (p == NULL)
@@ -52,8 +54,8 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int split
     }
     else
     {
-        strcpy(log_name, p + 1);
-        strncpy(dir_name, file_name, p - file_name + 1);
+        strcpy(log_name, p + 1);   //logname = ServerLog
+        strncpy(dir_name, file_name, p - file_name + 1); //   dir_name = ./log_record
         snprintf(log_full_name, 255, "%s%d_%02d_%02d_%s", dir_name, my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday, log_name);
     }
 
